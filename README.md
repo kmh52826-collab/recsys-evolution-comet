@@ -18,15 +18,12 @@ COMET 모델이 데이터를 어떻게 '시각적 패턴'으로 해석하여 정
 ---
 ### 2. Multi-Dimensional Interaction Cube
 > 단순한 2차원 관계를 넘어, 사용자(User), 아이템(Item), 그리고 특징(Feature)이 결합된 고차원적 관계를 모델링합니다.
-<img width="1533" height="652" alt="image" src="https://github.com/user-attachments/assets/18a6f4e6-dddb-41e9-90b5-07756de1fa41" />
+<img width="2413" height="981" alt="image" src="https://github.com/user-attachments/assets/ab1c6467-822f-45de-ab56-a6fcc2094085" />
 
 ---
 ### 3. Full Architecture Overview
-입력단에서부터 히스토리 데이터를 통합하여 고차원적인 특징을 추출하도록 설계된 전체 학습 프로세스입니다.
+> 입력단에서부터 히스토리 데이터를 통합하여 고차원적인 특징을 추출하도록 설계된 전체 학습 프로세스입니다.
 <img width="2556" height="1326" alt="image" src="https://github.com/user-attachments/assets/f16b9479-0eb6-43bf-a639-a59c1b3e368c" />
-
-* **Input Layer Innovation**: 표준 표현 학습 모델과 달리, Target ID뿐만 아니라 **상호작용 히스토리(Interaction History)**를 입력단에 직접 통합하여 모델이 풍부한 맥락(Context)을 파악하도록 설계되었습니다.
-* **Dimensional Interaction**: 생성된 임베딩 맵에 CNN과 DNN을 차례로 적용하여, 차원 간의 비선형적인 관계를 학습하고 최종 선호도를 예측합니다.
 
 ### 📊 Experimental Analysis & Insights
 본 실험에서는 **NeuMF**, **ConvNCF**, **COMET** 세 가지 모델을 비교 구현하여 데이터 환경에 따른 성능 특성을 검증했습니다.
