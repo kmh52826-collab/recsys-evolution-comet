@@ -2,8 +2,6 @@
 
 > **Paper:** *COMET: Convolutional Dimension Interaction for Collaborative Filtering (ACM TIST, 2023)*
 
-COMET(Convolutional Dimension Interaction for Collaborative Filtering)은 **2D 합성곱 신경망(CNN)** 을 활용하여 사용자의 상호작용 히스토리 내에 숨겨진 복잡한 패턴을 포착하는 차세대 협업 필터링 모델입니다. 본 프로젝트에서는 NeuMF와 ConvNCF를 거쳐 COMET으로 이어지는 모델의 진화 과정을 심층 분석했습니다.
-
 ### 🎯 Key Architectural Innovations
 * 여기에다가는 이 프로젝트의 전체 내용을 함축한 것을 집어넣어야 함. 마지막에 하기
 
