@@ -8,20 +8,23 @@
 ## 🖼️ Visual Guide: Understanding COMET
 COMET 모델이 데이터를 어떻게 '시각적 패턴'으로 해석하여 정교한 추천을 수행하는지 설명합니다.
 
-### 1. The Concept of Embedding Maps
+---
+### 1. Full Architecture Overview
+> 입력단에서부터 히스토리 데이터를 통합하여 고차원적인 특징을 추출하도록 설계된 전체 학습 프로세스입니다.
+<img width="2556" height="1326" alt="image" src="https://github.com/user-attachments/assets/f16b9479-0eb6-43bf-a639-a59c1b3e368c" />
+
+
+---
+### 2. The Concept of Embedding Maps
 > COMET은 사용자의 과거 이력을 단순한 수치가 아닌 하나의 **'그림(Picture)'** 으로 변환하여 처리합니다.
 
 <img width="1390" height="427" alt="image" src="https://github.com/user-attachments/assets/0c7a94fe-7eba-415a-933d-d74cdcfa3b58" />
 
 ---
-### 2. Multi-Dimensional Interaction Cube
+### 3. Multi-Dimensional Interaction Cube
 > 단순한 2차원 관계를 넘어, 사용자(User), 아이템(Item), 그리고 특징(Feature)이 결합된 고차원적 관계를 모델링합니다.
 <img width="2413" height="981" alt="image" src="https://github.com/user-attachments/assets/ab1c6467-822f-45de-ab56-a6fcc2094085" />
 
----
-### 3. Full Architecture Overview
-> 입력단에서부터 히스토리 데이터를 통합하여 고차원적인 특징을 추출하도록 설계된 전체 학습 프로세스입니다.
-<img width="2556" height="1326" alt="image" src="https://github.com/user-attachments/assets/f16b9479-0eb6-43bf-a639-a59c1b3e368c" />
 
 ---
 
