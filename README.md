@@ -8,7 +8,6 @@
 ## 🖼️ Visual Guide: Understanding COMET
 COMET 모델이 데이터를 어떻게 '시각적 패턴'으로 해석하여 정교한 추천을 수행하는지 설명합니다.
 
----
 ### 1. Full Architecture Overview
 > 입력단에서부터 히스토리 데이터를 통합하여 고차원적인 특징을 추출하도록 설계된 전체 학습 프로세스입니다.
 <img width="2556" height="1326" alt="image" src="https://github.com/user-attachments/assets/f16b9479-0eb6-43bf-a639-a59c1b3e368c" />
