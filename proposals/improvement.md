@@ -10,6 +10,8 @@
 
 ---
 
+<br>
+
 ## 🚀 Proposed Improvements & Methodology (제안 방법론)
 
 ### 1. Dynamic Weighting Mechanism (가설)
@@ -20,6 +22,10 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 
 ### 3. Systematic Evaluation Plan (실험 계획)
 **Batch Size 256** 기반의 안정적인 학습 환경에서 기존 SOTA 모델들과의 성능 비교를 수행하기 위한 실험 설계를 마쳤으며, 특히 극심한 Cold-start 상황에서의 성능 방어력을 중점적으로 검증할 계획입니다.
+
+---
+
+<br>
 
 ## 💎 Research Contributions (연구 기여점)
 
@@ -41,7 +47,11 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 99% 이상의 데이터 희소성을 가진 환경을 가정하여, 부족한 Interaction 데이터를 Graph와 Side Info가 보완하도록 설계되었습니다.
 * **연구적 가치**: Cold-start 유저나 Interaction이 적은 아이템에 대해서도 **Robust Embedding**을 생성할 수 있음을 이론적으로 제시하며, 이는 실무적 추천 시스템이 직면한 가장 큰 난제를 해결하기 위한 연구적 대안을 제시합니다.
 
-* ## 🏗 Framework Architecture (모델 구조)
+---
+
+<br>
+
+## 🏗 Framework Architecture (모델 구조)
 
 M-Trans4Rec은 이질적인 데이터 소스로부터 개별적인 특징을 추출하는 **Parallel Multi-Encoder** 계층과, 이를 유기적으로 통합하는 **Adaptive Fusion** 계층으로 구성됩니다. 전체적인 데이터 흐름은 다음과 같습니다.
 
@@ -56,7 +66,7 @@ M-Trans4Rec은 이질적인 데이터 소스로부터 개별적인 특징을 추
 | **Hidden Layer** | Dense Blocks | 특징 차원 확장 및 비선형 관계 학습 (128→256→64) | [Batch, 64] |
 | **Output Layer** | Score Predictor | 최종 아이템 선호도 확률(Scalar) 도출 | [Batch, 1] |
 
----
+<br>
 
 ### 2. Encoder Specifications (인코더 상세 설명)
 
@@ -75,7 +85,7 @@ M-Trans4Rec은 이질적인 데이터 소스로부터 개별적인 특징을 추
 * **메커니즘**: Multi-Layer Perceptron(MLP) 혹은 가공된 Embedding Layer를 통해 정적인 속성을 벡터화합니다.
 * **연구적 의의**: 상호작용 기록이 전혀 없는 **Cold-start** 유저에 대해서도 최소한의 추천 근거를 제공합니다.
 
----
+<br>
 
 ### 3. Systematic Data Flow (데이터 흐름)
 
