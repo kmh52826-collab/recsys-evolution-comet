@@ -29,7 +29,7 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 
 ## 💎 Research Contributions (연구 기여점)
 
-본 제안 모델인 **M-Trans4Rec**은 기존 Sequential Recommendation 연구들이 가진 구조적 한계를 극복하기 위해 다음과 같은 세 가지 핵심적인 연구적 기여(Contributions)를 갖습니다.
+> 본 제안 모델인 **M-Trans4Rec**은 기존 Sequential Recommendation 연구들이 가진 구조적 한계를 극복하기 위해 다음과 같은 세 가지 핵심적인 연구적 기여(Contributions)를 갖습니다.
 
 ### 1. Adaptive Multi-Modal Fusion via Gating Network
 기존 연구(예: COMET)들이 다종 정보를 단순 합산(Summation)하거나 고정된 비율로 결합(Concatenation)했던 것과 달리, 본 모델은 **Adaptive Gating Network**를 도입하였습니다.
@@ -53,7 +53,7 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 
 ## 🏗 Framework Architecture (모델 구조)
 
-M-Trans4Rec은 이질적인 데이터 소스로부터 개별적인 특징을 추출하는 **Parallel Multi-Encoder** 계층과, 이를 유기적으로 통합하는 **Adaptive Fusion** 계층으로 구성됩니다. 전체적인 데이터 흐름은 다음과 같습니다.
+> M-Trans4Rec은 이질적인 데이터 소스로부터 개별적인 특징을 추출하는 **Parallel Multi-Encoder** 계층과, 이를 유기적으로 통합하는 **Adaptive Fusion** 계층으로 구성됩니다. 전체적인 데이터 흐름은 다음과 같습니다.
 
 ### 1. Model Overview (모델 개요)
 본 모델은 유저의 과거 행동 데이터(Sequential), 유저-아이템 간의 복합 관계(Graph), 그리고 유저의 고유 속성(Side Info)을 동시에 입력받아 최종 추천 확률을 계산하는 **End-to-End Framework**입니다.
@@ -93,3 +93,60 @@ M-Trans4Rec은 이질적인 데이터 소스로부터 개별적인 특징을 추
 2.  **Adaptive Weighting**: Gating Network가 세 전문가의 의견(128x3)을 검토하여, 현재 유저에게 가장 신뢰도 높은 정보에 높은 가중치를 부여하며 하나로 통합($z_{final}$)합니다.
 3.  **Dimensional Manifold Learning**: 통합된 128차원 벡터는 **Dense 1(256)**에서 고차원으로 확장되어 복잡한 특징 결합을 학습한 뒤, **Dense 2(128)**와 **Dense 3(64)**를 거치며 핵심 정보로 압축됩니다.
 4.  **Final Inference**: 최종적으로 64개의 정제된 특징은 가중치 벡터 $W_{out}$과 연산되어, 해당 아이템을 클릭할 확률을 의미하는 **스칼라값**으로 변환됩니다.
+
+---
+
+<br>
+
+## 📐 Mathematical Foundations (수식적 근거)
+
+> M-Trans4Rec의 성능 향상을 뒷받침하는 핵심 메커니즘인 Self-Attention, Graph Attention, 그리고 Adaptive Gating에 대한 수식적 정의와 연구적 논거입니다.
+
+### 1. Self-Attention Mechanism (Sequential Encoder)
+유저의 행동 시퀀스 내에서 아이템 간의 상관관계를 계산하여 장기적/단기적 의존성을 포착합니다.
+
+$$
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+$$
+
+* **수식의 역할**: $Q$(Query), $K$(Key), $V$(Value) 벡터 간의 내적을 통해 각 아이템이 현재 맥락에서 갖는 중요도(Attention Weight)를 산출합니다. $\sqrt{d_k}$로 나누는 스케일링은 Gradient vanishing을 방지하여 학습의 안정성을 높입니다.
+* **논리적 기여**: 유저의 과거 행동 중 현재의 클릭을 유발한 '핵심 아이템'에 더 높은 가중치를 부여함으로써, 노이즈가 섞인 시퀀스에서도 정교한 의도 파악이 가능해집니다.
+
+<br>
+
+### 2. Graph Attention Network (Graph Encoder)
+유저-아이템 그래프 상에서 이웃 노드의 정보를 동적으로 수집하여 Collaborative Signal을 강화합니다.
+
+$$
+\alpha_{ij} = \frac{\exp(\text{LeakyReLU}(\vec{a}^T [W\vec{h}_i \, \Vert \, W\vec{h}_j]))}{\sum_{k \in \mathcal{N}_i} \exp(\text{LeakyReLU}(\vec{a}^T [W\vec{h}_i \, \Vert \, W\vec{h}_k]))}
+$$
+
+* **수식의 역할**: 노드 $i$와 이웃 노드 $j$ 사이의 관계를 나타내는 $\alpha_{ij}$(Attention Coefficient)를 계산합니다. $\Vert$는 Concatenation 연산을 의미하며, 학습 가능한 벡터 $\vec{a}$를 통해 이웃의 중요도를 결정합니다.
+* **논리적 기여**: 모든 이웃이 동일하게 중요하다는 가정을 탈피하여, 유저의 현재 취향과 더 밀접한 관련이 있는 이웃 노드의 정보를 더 많이 전파(Message Passing)받습니다. 이는 데이터 희소성 문제 해결의 핵심 기제입니다.
+
+<br>
+
+### 3. Adaptive Gating Mechanism (Information Fusion)
+서로 다른 인코더에서 산출된 벡터들을 유저별 맥락에 맞게 적응적으로 통합합니다.
+
+$$
+g = \sigma(W_g \cdot [z_{seq} \, \Vert \, z_{graph} \, \Vert \, z_{side}] + b_g)
+$$
+$$
+z_{final} = g_1 \odot z_{seq} + g_2 \odot z_{graph} + g_3 \odot z_{side}
+$$
+
+* **수식의 역할**: $\sigma$(Sigmoid) 함수를 통해 0과 1 사이의 가중치 벡터 $g$를 생성합니다. 이후 각 인코더의 결과값과 요소별 곱(Element-wise product, $\odot$)을 수행하여 최종 벡터 $z_{final}$을 산출합니다.
+* **논리적 기여**: 특정 시점 혹은 특정 유저에게 어떤 모달리티(Modality)가 가장 유효한지를 모델이 스스로 판단하게 합니다. 이는 정적 통합(Static Fusion) 방식이 가진 정보 왜곡 문제를 해결하고 모델의 유연성을 극대화합니다.
+
+<br>
+
+### 4. Objective Function (Optimization)
+모델은 최종적으로 예측값 $\hat{y}$와 실제 라벨 $y$ 사이의 Cross-Entropy를 최소화하는 방향으로 학습됩니다.
+
+$$
+\mathcal{L} = -\sum_{u, i \in \mathcal{D}} \left( y_{ui} \log(\hat{y}_{ui}) + (1 - y_{ui}) \log(1 - \hat{y}_{ui}) \right) + \lambda \Vert \Theta \Vert_2
+$$
+
+* **수식의 역할**: 예측 오차를 계산함과 동시에 $L_2$ Regularization($\lambda \Vert \Theta \Vert_2$)을 통해 파라미터의 과도한 비대를 막습니다.
+* **논리적 기여**: 극심한 Sparsity 환경에서 발생할 수 있는 Overfitting을 방지하며, 모델이 일반화된 특징을 학습하도록 유도합니다.
