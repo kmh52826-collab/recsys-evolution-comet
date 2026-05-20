@@ -52,11 +52,11 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 <br>
 
 ## 🏗 Framework Architecture (모델 구조)
-<img width="2554" height="1094" alt="image" src="https://github.com/user-attachments/assets/d69d1a61-b3c4-4177-8d4d-61e43fccb888" />
+<img width="2555" height="1080" alt="image" src="https://github.com/user-attachments/assets/2e37abc9-5eeb-456b-9a43-712197932dfc" />
 
 > M-Trans4Rec은 이질적인 데이터 소스로부터 개별적인 특징을 추출하는 **Parallel Multi-Encoder** 계층과, 이를 유기적으로 통합하는 **Adaptive Fusion** 계층으로 구성됩니다. 전체적인 데이터 흐름은 다음과 같습니다.
 
-### 1. Model Overview (모델 개요)
+### Model Overview (모델 개요)
 본 모델은 유저의 과거 행동 데이터(Sequential), 유저-아이템 간의 복합 관계(Graph), 그리고 유저의 고유 속성(Side Info)을 동시에 입력받아 최종 추천 확률을 계산하는 **End-to-End Framework**입니다.
 
 | Layer | Component | Function | Output Shape |
@@ -69,19 +69,23 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 
 <br>
 
-### 2. Encoder Specifications (인코더 상세 설명)
+## 🏗 Encoder Specifications (인코더 상세 설명)
 
-#### 🟢 Sequential Encoder (Behavioral Context)
+### 🔵 Sequential Encoder (Behavioral Context)
+<img width="2554" height="1285" alt="image" src="https://github.com/user-attachments/assets/60462717-a824-4351-ad21-bc1199442b12" />
+
 * **역할**: 유저가 소비한 아이템의 시간적 순서(Temporal Order)를 분석하여 유저의 **Short-term Interest**를 파악합니다.
 * **메커니즘**: Transformer의 Self-attention 구조를 활용하여, 아이템 간의 인과 관계와 맥락적 의존성을 학습합니다.
 * **연구적 의의**: 단순한 구매 빈도가 아닌, '행동의 흐름' 속에 숨겨진 의도를 포착합니다.
 
-#### 🔵 Graph Encoder (Structural Context)
+<br>
+
+### 🟠 Graph Encoder (Structural Context)
 * **역할**: 유저와 아이템, 혹은 유저와 유저 사이의 복잡한 연결망을 통해 **Collaborative Signal**을 추출합니다.
 * **메커니즘**: LightGCN 혹은 Graph Sage 구조를 채택하여, 직접적인 상호작용이 없는 아이템이라도 그래프 상의 고차 이웃(High-order Neighbors) 정보를 통해 잠재적 선호도를 계산합니다.
 * **연구적 의의**: Interaction 데이터가 부족한 상황(Sparsity)에서 주변 노드의 정보를 전파(Message Passing)받아 데이터 부족 문제를 완화합니다.
 
-#### 🟡 Side Info Encoder (Attribute Context)
+### 🟢 Side Info Encoder (Attribute Context)
 * **역할**: 유저의 인구통계학적 특성(성별, 나이, 지역 등)과 아이템의 메타 정보(카테고리, 브랜드 등)를 분석합니다.
 * **메커니즘**: Multi-Layer Perceptron(MLP) 혹은 가공된 Embedding Layer를 통해 정적인 속성을 벡터화합니다.
 * **연구적 의의**: 상호작용 기록이 전혀 없는 **Cold-start** 유저에 대해서도 최소한의 추천 근거를 제공합니다.
