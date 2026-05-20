@@ -52,7 +52,7 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 <br>
 
 ## 🏗 Framework Architecture (모델 구조)
-<img width="2553" height="1083" alt="image" src="https://github.com/user-attachments/assets/70bbb01f-f6d2-499d-a455-98df1e048f5a" />
+<img width="2554" height="1094" alt="image" src="https://github.com/user-attachments/assets/d69d1a61-b3c4-4177-8d4d-61e43fccb888" />
 
 > M-Trans4Rec은 이질적인 데이터 소스로부터 개별적인 특징을 추출하는 **Parallel Multi-Encoder** 계층과, 이를 유기적으로 통합하는 **Adaptive Fusion** 계층으로 구성됩니다. 전체적인 데이터 흐름은 다음과 같습니다.
 
