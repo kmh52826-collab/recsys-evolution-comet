@@ -10,8 +10,6 @@
 
 ---
 
-<br>
-
 ## 🚀 Proposed Improvements & Methodology (제안 방법론)
 
 ### 1. Dynamic Weighting Mechanism (가설)
@@ -24,8 +22,6 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 **Batch Size 256** 기반의 안정적인 학습 환경에서 기존 SOTA 모델들과의 성능 비교를 수행하기 위한 실험 설계를 마쳤으며, 특히 극심한 Cold-start 상황에서의 성능 방어력을 중점적으로 검증할 계획입니다.
 
 ---
-
-<br>
 
 ## 💎 Research Contributions (연구 기여점)
 
@@ -49,10 +45,8 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 
 ---
 
-<br>
-
 ## 🏗 Framework Architecture (모델 구조)
-<img width="2555" height="1080" alt="image" src="https://github.com/user-attachments/assets/2e37abc9-5eeb-456b-9a43-712197932dfc" />
+<img width="2553" height="1099" alt="image" src="https://github.com/user-attachments/assets/1565512f-b18b-4c4e-a1b8-d25d9edbbb8f" />
 
 > M-Trans4Rec은 이질적인 데이터 소스로부터 개별적인 특징을 추출하는 **Parallel Multi-Encoder** 계층과, 이를 유기적으로 통합하는 **Adaptive Fusion** 계층으로 구성됩니다. 전체적인 데이터 흐름은 다음과 같습니다.
 
@@ -72,7 +66,7 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 ## 🏗 Encoder Specifications (인코더 상세 설명)
 
 ### 🔵 Sequential Encoder (Behavioral Context)
-<img width="2554" height="1285" alt="image" src="https://github.com/user-attachments/assets/60462717-a824-4351-ad21-bc1199442b12" />
+<img width="2550" height="1278" alt="image" src="https://github.com/user-attachments/assets/5780cb81-f261-4bb5-80b6-08b5a06b2bf8" />
 
 * **역할**: 유저가 소비한 아이템의 시간적 순서(Temporal Order)를 분석하여 유저의 **Short-term Interest**를 파악합니다.
 * **메커니즘**: Transformer의 Self-attention 구조를 활용하여, 아이템 간의 인과 관계와 맥락적 의존성을 학습합니다.
@@ -81,6 +75,8 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 <br>
 
 ### 🟠 Graph Encoder (Structural Context)
+<img width="2346" height="1280" alt="image" src="https://github.com/user-attachments/assets/dff1703d-6f20-48ee-8038-c9395b9fc583" />
+
 * **역할**: 유저와 아이템, 혹은 유저와 유저 사이의 복잡한 연결망을 통해 **Collaborative Signal**을 추출합니다.
 * **메커니즘**: LightGCN 혹은 Graph Sage 구조를 채택하여, 직접적인 상호작용이 없는 아이템이라도 그래프 상의 고차 이웃(High-order Neighbors) 정보를 통해 잠재적 선호도를 계산합니다.
 * **연구적 의의**: Interaction 데이터가 부족한 상황(Sparsity)에서 주변 노드의 정보를 전파(Message Passing)받아 데이터 부족 문제를 완화합니다.
