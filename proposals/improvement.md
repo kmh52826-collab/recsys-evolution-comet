@@ -94,7 +94,7 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 
 ## 🔄 Adaptive Fusion & Prediction (정보 통합 및 최종 예측)
 
-### 🟣 Fusion Layer (Adaptive Gating Mechanism)
+### 🟤 Fusion Layer (Adaptive Gating Mechanism)
 <img width="2551" height="1153" alt="image" src="https://github.com/user-attachments/assets/63abe53c-9107-4f69-9655-800bc6e4ec18" />
 
 * **역할**: 앞선 세 가지 독립적인 인코더(Sequence, Graph, Side Info)에서 추출된 서로 다른 도메인의 특징 벡터들을 유저의 상황에 맞게 **동적으로 결합(Adaptive Blending)**합니다.
@@ -103,7 +103,7 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 
 <br>
 
-### 🟤 Prediction Layer (Hierarchical MLP)
+### 🟣 Prediction Layer (Hierarchical MLP)
 <img width="2550" height="1278" alt="image" src="https://github.com/user-attachments/assets/YOUR_MLP_IMAGE_HASH" />
 
 * **역할**: 통합된 융합 벡터(z_final)를 바탕으로, 타겟 유저가 특정 아이템을 선호하거나 구매할 확률을 최종적으로 예측합니다.
