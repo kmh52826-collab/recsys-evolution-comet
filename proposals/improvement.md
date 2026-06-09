@@ -82,6 +82,8 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 * **연구적 의의**: Interaction 데이터가 부족한 상황(Sparsity)에서 주변 노드의 정보를 전파(Message Passing)받아 데이터 부족 문제를 완화합니다.
 
 ### 🟢 Side Info Encoder (Attribute Context)
+<img width="2361" height="1266" alt="image" src="https://github.com/user-attachments/assets/9ff7881f-67af-4cc7-aa32-9fbae6bd38e6" />
+
 * **역할**: 유저의 인구통계학적 특성(성별, 나이, 지역 등)과 아이템의 메타 정보(카테고리, 브랜드 등)를 분석합니다.
 * **메커니즘**: Multi-Layer Perceptron(MLP) 혹은 가공된 Embedding Layer를 통해 정적인 속성을 벡터화합니다.
 * **연구적 의의**: 상호작용 기록이 전혀 없는 **Cold-start** 유저에 대해서도 최소한의 추천 근거를 제공합니다.
