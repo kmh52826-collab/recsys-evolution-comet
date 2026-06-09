@@ -104,7 +104,7 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 <br>
 
 ### 🟣 Prediction Layer (Hierarchical MLP)
-<img width="2550" height="1278" alt="image" src="https://github.com/user-attachments/assets/YOUR_MLP_IMAGE_HASH" />
+<img width="2486" height="1264" alt="image" src="https://github.com/user-attachments/assets/e4bb4763-0df8-4456-967f-ea8b5403e5d1" />
 
 * **역할**: 통합된 융합 벡터(z_final)를 바탕으로, 타겟 유저가 특정 아이템을 선호하거나 구매할 확률을 최종적으로 예측합니다.
 * **메커니즘**: 계층적 구조의 Dense Layer(256차원 -> 128차원 -> 64차원)와 ReLU 활성화 함수를 거치며 복잡한 비선형 특징(High-order non-linear features)을 학습하고, 마지막에 Sigmoid 함수를 적용하여 0과 1 사이의 선호도 점수(y_ui)를 산출합니다.
