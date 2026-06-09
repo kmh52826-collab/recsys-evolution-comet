@@ -81,6 +81,8 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 * **메커니즘**: LightGCN 혹은 Graph Sage 구조를 채택하여, 직접적인 상호작용이 없는 아이템이라도 그래프 상의 고차 이웃(High-order Neighbors) 정보를 통해 잠재적 선호도를 계산합니다.
 * **연구적 의의**: Interaction 데이터가 부족한 상황(Sparsity)에서 주변 노드의 정보를 전파(Message Passing)받아 데이터 부족 문제를 완화합니다.
 
+<br>
+
 ### 🟢 Side Info Encoder (Attribute Context)
 <img width="2361" height="1266" alt="image" src="https://github.com/user-attachments/assets/9ff7881f-67af-4cc7-aa32-9fbae6bd38e6" />
 
