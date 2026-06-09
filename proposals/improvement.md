@@ -29,24 +29,19 @@ Adaptive Fusion 계층을 통과한 128차원 벡터를 **Prediction Layer(MLP)*
 
 ## 💎 Research Contributions (연구 기여점)
 
-> 본 제안 모델인 **M-Trans4Rec**은 기존 순차적 추천 연구들이 가진 구조적 한계를 극복하기 위해 다음과 같은 네 가지 핵심적인 연구적 기여(Contributions)를 갖습니다.
+> 본 제안 모델인 **M-Trans4Rec**은 기존 CNN 기반 순차적 추천(Sequential Recommendation) 연구들이 가진 구조적 한계를 극복하기 위해 다음과 같은 세 가지 핵심적인 연구적 기여(Contributions)를 갖습니다.
 
 ### 1. Context-Aware Feature Fusion via Adaptive Gating Network
-기존 연구들이 이종 정보를 단순 합산(Summation)하거나 고정된 비율로 결합(Concatenation)했던 것과 달리, 본 모델은 **Adaptive Gating Network**를 도입하였습니다.
-* **연구적 가치**: 사용자 상태나 상황에 따라 정보의 유효성이 다르다는 점(예: 행동 시퀀스가 지배적인 유저와 그래프 관계망 정보가 지배적인 유저의 차이)을 인지하고, 이를 데이터로부터 가중치를 스스로 학습하여 표현력 왜곡이 없는 컨텍스트 맞춤형 특징 융합을 가능하게 합니다.
+기존 연구들이 이종 정보를 단순 합산(Summation)하거나 고정된 비율로 결합(Concatenation)했던 것과 달리, 본 모델은 데이터 맥락에 반응하는 **Adaptive Gating Network**를 도입하였습니다.
+* **학술적 가치**: 유저 상태나 상황에 따라 정보의 유효성이 다르다는 점(예: 행동 시퀀스가 지배적인 유저와 그래프 관계망 정보가 지배적인 유저의 차이)을 인지하고, 이를 모델이 스스로 학습하여 표현력 왜곡이 없는 컨텍스트 맞춤형 특징 융합을 가능하게 합니다.
 
 ### 2. Specialized Multi-Encoder Architecture for Heterogeneous Data
-서로 다른 성격을 가진 세 가지 데이터 소스(Sequential, Graph, Side Info)를 개별적인 **Dedicated Encoders**를 통해 독립적으로 학습합니다.
-* **연구적 가치**: 데이터의 이질성(Heterogeneity)을 인정하고 각 영역에 최적화된 Representation을 먼저 추출함으로써, 정보 간의 상호 간섭(Interference)을 최소화하고 각 데이터가 가진 고유한 패턴(시간, 연결성, 속성)을 최대한 보존하는 **Modular Learning**을 실현합니다.
+서로 다른 성격을 가진 세 가지 데이터 소스(Sequential, Graph, Side Info)를 개별적인 **Dedicated Encoders**를 통해 독립적으로 파악합니다.
+* **학술적 가치**: 데이터의 이질성(Heterogeneity)을 반영하여 각 도메인에 최적화된 Representation을 먼저 추출함으로써, 정보 간의 상호 간섭(Interference)을 최소화하고 각 데이터가 가진 고유한 패턴(시간, 연결성, 속성)을 최대한 보존하는 **Modular Learning**을 실현합니다.
 
 ### 3. Strategic Feature Engineering with Expansion-Compression (128-256-128-64)
-모델 내부의 은닉 차원을 의도적으로 확장(Expansion)했다가 다시 계층적으로 압축(Compression)하는 **MLP 블록 구조**를 설계했습니다.
-* **연구적 가치**: 초기 Dense Layer에서 차원을 256으로 확장하여 다중 소스 정보 간의 **High-order 비선형 상호작용**을 충분히 모델링하고, 이후 점진적으로 64차원까지 압축하여 핵심 특징 지표만을 남깁니다. 이는 모델의 일반화(Generalization) 능력을 극대화하고 과적합을 제어하는 핵심 기제입니다.
-
-### 4. Overcoming Convolutional Bottlenecks
-기존 CNN 모델의 단일 크기 필터 한계를 깨고 고차 시간 의존성 및 관계적 연결성을 동시에 포착할 수 있는 구조를 이론화했습니다.
-* **연구적 가치**: 트랜스포머의 전역적 시야와 GNN의 이웃 노드 메시지 패싱(Message Passing) 메커니즘을 순차 추천 패러다임에 성공적으로 결합함으로써, 기존 학계가 직면했던 구조적 정보 손실 문제를 해결할 수 있는 명확한 대안을 제시합니다.
-
+최종 예측 계층 내부의 은닉 차원을 의도적으로 확장(Expansion)했다가 다시 계층적으로 압축(Compression)하는 **MLP 블록 구조**를 설계했습니다.
+* **학술적 가치**: 융합 벡터를 256차원으로 확장하여 이종 소스 정보 간의 **High-order 비선형 상호작용**을 충분히 모델링하고, 이후 점진적으로 64차원까지 압축하여 핵심 특징 지표만을 남깁니다. 이는 모델의 일반화(Generalization) 능력을 극대화하고 과적합(Overfitting)을 방지하는 핵심 기제입니다.
 ---
 
 ## 🏗 Framework Architecture (모델 구조)
