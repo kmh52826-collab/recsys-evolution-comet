@@ -90,6 +90,24 @@ COMET의 고정된 변환 방식 대신, 유저의 실시간 데이터에 따라
 
 <br>
 
+## 🔄 Adaptive Fusion & Prediction (정보 통합 및 최종 예측)
+
+### 🟣 Fusion Layer (Adaptive Gating Mechanism)
+<img width="2551" height="1153" alt="image" src="https://github.com/user-attachments/assets/63abe53c-9107-4f69-9655-800bc6e4ec18" />
+
+* **역할**: 앞선 세 가지 독립적인 인코더(Sequence, Graph, Side Info)에서 추출된 서로 다른 도메인의 특징 벡터들을 유저의 상황에 맞게 **동적으로 결합(Adaptive Blending)**합니다.
+* **메커니즘**: Gating Network를 통해 현재 입력 데이터의 맥락을 분석하여 각 인코더별 가중치(g1, g2, g3)를 Softmax 연산으로 산출한 뒤, 가중합(Weighted Sum)을 통해 하나의 통합 벡터(z_final)를 생성합니다.
+* **연구적 의의**: 모든 유저에게 고정된 비중을 적용하는 단순 결합(Concat) 방식과 달리, 행동 이력이 짧은 유저에게는 Side Info에 가중치를 두고, 이력이 긴 유저에게는 Sequence 정보에 가중치를 두는 등 **상황별 최적의 정보 조합을 모델이 스스로 학습**하도록 유도합니다.
+
+<br>
+
+### 🟤 Prediction Layer (Hierarchical MLP)
+<img width="2550" height="1278" alt="image" src="https://github.com/user-attachments/assets/YOUR_MLP_IMAGE_HASH" />
+
+* **역할**: 통합된 융합 벡터(z_final)를 바탕으로, 타겟 유저가 특정 아이템을 선호하거나 구매할 확률을 최종적으로 예측합니다.
+* **메커니즘**: 계층적 구조의 Dense Layer(256차원 -> 128차원 -> 64차원)와 ReLU 활성화 함수를 거치며 복잡한 비선형 특징(High-order non-linear features)을 학습하고, 마지막에 Sigmoid 함수를 적용하여 0과 1 사이의 선호도 점수(y_ui)를 산출합니다.
+* **연구적 의의**: 선형적인 결합이 놓치기 쉬운 특징 차원 간의 고차원적이고 복잡한 상호작용(High-order interaction)을 딥러닝 구조를 통해 완벽히 포착하여 예측 정밀도를 극대화합니다.
+
 ### 3. Systematic Data Flow (데이터 흐름)
 
 1.  **Parallel Feature Extraction**: 256명의 유저(Batch) 데이터가 입력되면, 세 가지 인코더가 병렬적으로 각 유저를 **128차원의 개별 벡터**로 변환합니다.
