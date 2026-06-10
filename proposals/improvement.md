@@ -89,7 +89,7 @@ Adaptive Fusion 계층을 통과한 128차원 벡터를 **Prediction Layer(MLP)*
 * **메커니즘**: Multi-Layer Perceptron(MLP) 혹은 가공된 Embedding Layer를 통해 정적인 속성을 밀밀도 벡터화(Dense Embedding)합니다.
 * **연구적 의의**: 행동 기록이 없는 정적 데이터의 특성을 임베딩 공간에 매핑하여 정적 메타데이터 활용의 부재 한계를 원천 보완합니다.
 
----
+<br>
 
 ## 🔄 Adaptive Fusion & Prediction (정보 통합 및 최종 예측)
 
@@ -110,63 +110,6 @@ Adaptive Fusion 계층을 통과한 128차원 벡터를 **Prediction Layer(MLP)*
 * **연구적 의의**: 선형적인 결합이 놓치기 쉬운 특징 차원 간의 고차원적이고 복잡한 상호작용(High-order interaction)을 다층 은닉 계층 구조를 통해 포착하여 최종 예측 정밀도를 극대화합니다.
 
 ---
-
-## 📐 Mathematical Foundations (수식적 근거)
-
-> M-Trans4Rec의 성능 향상을 뒷받침하는 핵심 메커니즘인 Self-Attention, Graph Attention, 그리고 Adaptive Gating에 대한 수식적 정의와 연구적 논거입니다.
-
-### 1. Self-Attention Mechanism (Sequential Encoder)
-유저의 행동 시퀀스 내에서 아이템 간의 상관관계를 계산하여 장기적/단기적 의존성을 포착합니다.
-
-$$
-\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
-$$
-
-* **수식의 역할**: $Q$(Query), $K$(Key), $V$(Value) 벡터 간의 내적을 통해 각 아이템이 현재 맥락에서 갖는 중요도(Attention Weight)를 산출합니다. $\sqrt{d_k}$로 나누는 스케일링은 Gradient vanishing을 방지하여 학습의 안정성을 높입니다.
-* **논리적 기여**: 고정된 커널의 시야 한계를 벗어나 유저의 과거 행동 중 현재 예측 시점과 유기적으로 연결된 '핵심 맥락 아이템'에 더 높은 가중치를 부여함으로써 시간적 의존성 한계를 해결합니다.
-
-<br>
-
-### 2. Graph Attention Network (Graph Encoder)
-유저-아이템 그래프 상에서 이웃 노드의 정보를 동적으로 수집하여 Collaborative Signal을 강화합니다.
-
-$$
-\alpha_{ij} = \frac{\exp(\text{LeakyReLU}(\vec{a}^T [W\vec{h}_i \, \Vert \, W\vec{h}_j]))}{\sum_{k \in \mathcal{N}_i} \exp(\text{LeakyReLU}(\vec{a}^T [W\vec{h}_i \, \Vert \, W\vec{h}_k]))}
-$$
-
-* **수식의 역할**: 노드 $i$와 이웃 노드 $j$ 사이의 관계를 나타내는 $\alpha_{ij}$(Attention Coefficient)를 계산합니다. $\Vert$는 Concatenation 연산을 의미하며, 학습 가능한 벡터 $\vec{a}$를 통해 이웃의 중요도를 결정합니다.
-* **논리적 기여**: 이웃 구조가 가진 중요도를 데이터 기반으로 학습하여 차별화된 메시지 전파(Message Passing)를 실현합니다. 이를 통해 공동 소비 패턴 속에 숨겨진 고차 구조 신호를 추출할 수 있습니다.
-
-<br>
-
-### 3. Adaptive Gating Mechanism (Information Fusion)
-서로 다른 인코더에서 산출된 벡터들을 유저별 맥락에 맞게 적응적으로 통합합니다.
-
-$$
-[g_{seq}, g_{graph}, g_{side}] = \text{softmax}(W_g \cdot [z_{seq} \, \Vert \, z_{graph} \, \Vert \, z_{side}] + b_g)
-$$
-$$
-z_{final} = g_{seq} \cdot z_{seq} + g_{graph} \cdot z_{graph} + g_{side} \cdot z_{side}
-$$
-
-* **수식의 역할**: 세 인코더의 128차원 출력 벡터들을 결합한 후, 선형 가중치 행렬 $W_g$ 및 $\text{softmax}$ 연산을 통해 합이 1이 되는 스칼라 가중치 세트($g_{seq}, g_{graph}, g_{side}$)를 산출합니다. 이후 각 벡터와 가중치 값을 결합하여 통합 벡터 $z_{final}$을 도출합니다.
-* **논리적 기여**: 정적 통합 방식이 가진 정보 왜곡 문제를 해결하고, 시간 패턴, 구조 패턴, 메타데이터 정보가 혼재된 상태에서 유저 컨텍스트별 최적의 정보 조합을 유연하게 수집하도록 유도합니다.
-
-<br>
-
-### 4. Objective Function (Optimization)
-모델은 최종적으로 예측값 $\hat{y}$와 실제 라벨 $y$ 사이의 Cross-Entropy를 최소화하는 방향으로 학습됩니다.
-
-$$
-\mathcal{L} = -\sum_{u, i \in \mathcal{D}} \left( y_{ui} \log(\hat{y}_{ui}) + (1 - y_{ui}) \log(1 - \hat{y}_{ui}) \right) + \lambda \Vert \Theta \Vert_2
-$$
-
-* **수식의 역할**: 예측 오차를 계산함과 동시에 $L_2$ Regularization($\lambda \Vert \Theta \Vert_2$)을 통해 파라미터의 과도한 비대를 막습니다.
-* **논리적 기여**: 복잡한 다중 인코더 및 깊은 MLP 계층 구조 하에서 발생할 수 있는 과적합(Overfitting)을 방지하며 모델이 안정적으로 일반화된 패턴을 학습하도록 유도합니다.
-
----
-
-<br>
 
 ## 🧪 Experimental Setup (실험 환경 설계)
 >본 제안 모델의 유효성을 검증하기 위해 설계된 데이터셋, 비교 모델(Baselines), 그리고 평가지표에 대한 상세 설정입니다.
@@ -217,8 +160,6 @@ M-Trans4Rec의 상대적 우위를 증명하기 위해 다음과 같은 최신 S
 
 ---
 
-<br>
-
 ## 📊 Experimental Results & Analysis (실험 결과 및 분석)
 
 ### 1. Performance Comparison (성능 비교 가상 결과)
@@ -263,8 +204,6 @@ Ablation Study 결과, **Graph Encoder를 제거했을 때 성능 하락 폭(-10
 
 ---
 
-<br>
-
 ## 🔮 Future Research Directions (향후 연구 방향)
 
 본 연구는 현재 설계된 M-Trans4Rec 프레임워크를 기반으로, 차세대 추천 시스템이 직면한 아키텍처적 과제들을 해결하기 위해 다음과 같은 세 가지 방향으로 연구를 확장하고자 합니다.
@@ -290,8 +229,6 @@ Ablation Study 결과, **Graph Encoder를 제거했을 때 성능 하락 폭(-10
 M-Trans4Rec은 단순히 정밀한 점수를 도출하는 모델을 넘어, 기존 CNN 추천 모델이 안고 있던 **시간적 의존성 부족, 구조적 연결성 간과, 메타데이터 활용 부재**라는 세 가지 본질적인 아키텍처 결함을 **Adaptive Multi-source Fusion**을 통해 유기적으로 통합 해소하려는 고도화된 시도입니다. 본 연구를 시작점으로 하여 사용자의 복합적인 선택 메커니즘을 가장 완벽하게 모사하는 차세대 추천 아키텍처를 발굴할 수 있다고 확신합니다.
 
 ---
-
-<br>
 
 ## 📚 References
 
