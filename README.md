@@ -1,4 +1,4 @@
-# [Ph.D. Portfolio] Next-Generation Recommender System Pipelines
+# Next-Generation Recommender System Pipelines
 ## Subtitle: From SOTA Baseline Replication to Multi-Encoder Adaptive Gating Architecture (M-Trans4Rec)
 
 ---
