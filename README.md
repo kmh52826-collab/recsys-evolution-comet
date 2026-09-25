@@ -7,12 +7,12 @@
 > **Reference Paper:** *COMET: Convolutional Dimension Interaction for Collaborative Filtering (ACM TIST, 2023)*
 
 ### 1.1 Research Motivation & Objective
-This study was initiated to directly replicate the PyTorch-based architecture of **COMET**, a state-of-the-art (SOTA) recommendation model published in ACM TIST (2023). Through comparative experiments against standard benchmark models, namely **NeuMF (2017)** and **ConvNCF (2018)**, this research validates data transformation efficiency and multi-dimensional entity modeling characteristics under large-scale data environments.
+This study was initiated to directly replicate the PyTorch-based architecture of **COMET**, a state-of-the-art (SOTA) recommendation model published in ACM TIST (2023). Through comparative experiments against standard benchmark models, namely **NeuMF (2017)** and **ConvNCF (2018)**, this research validates data transformation efficiency and multi-dimensional entity modeling characteristics in a controlled synthetic data environment.
 
 ### 1.2 🎯 Key Architectural Innovations of COMET
-* **User History Embedding Map**: Moving away from the simple single User-Item pair feeding approach, COMET innovates the preprocessing pipeline by abstracting the user's past $N$ interaction histories and the current target item into a single $[(N+1) \times d]$-dimensional 2D 'embedding map'.
-* **Explicit Dimension Interaction**: To overcome the limitations of NeuMF's simple concatenation, COMET explicitly models global cross-correlations between dimensions (dimension-wise correlation) via outer product operations.
-* **Spatial Pattern Extraction via CNN**: A multi-layer 2D CNN architecture is integrated into the system to extract spatial and contextual feature patterns from the structured 2D multi-dimensional data cube.
+* **User/Item History Embedding Maps**: Moving away from the simple single User-Item pair feeding approach, COMET innovates the preprocessing pipeline by horizontally stacking the embeddings of a user's interacted items, and of an item's interacted users, into **two 2D 'embedding maps'**.
+* **Internal & Dimensional Interaction via CNN**: To overcome the assumption in existing models that historical interactions and embedding dimensions are independent of each other, COMET applies CNNs with kernels of different sizes to simultaneously model interactions among historical interactions (internal interactions) and among embedding dimensions (dimensional interactions).
+* **Representation Enrichment**: The CNN outputs are passed through an MLP to obtain two interaction vectors, which are then used to enrich the original user and item embeddings before the final prediction.
 
 ---
 
@@ -34,17 +34,18 @@ Below is the data flow analysis demonstrating how the COMET model transforms raw
 ---
 
 ### 1.4 Detailed Implementation & Lab Report (PyTorch Experiment Summary)
-In this experiment, a comprehensive 17-chapter technical investigation was conducted, covering data preprocessing pipeline design, PyTorch model layer implementation, hyperparameter optimization, and ranking evaluation metric analysis.
+In this experiment, a comprehensive 16-chapter technical investigation was conducted, covering data preprocessing pipeline design, PyTorch model layer implementation, hyperparameter configuration, and ranking evaluation metric analysis.
 
 * **Framework & Dataset**: PyTorch 2.x + Cornac 2.3.5 / Synthetic Data (Power-law distribution, 1,000 Users, 500 Items, 15,000 Interactions, Density 3%)
-* **Core Implementation Logic**: Custom implementation of the $32 \times 32$ Interaction Map generation module via `Outer Product` and the `Multi-layer 2D CNN` forward pass pipeline.
+* **Core Implementation Logic**: Custom implementation of ConvNCF's $32 \times 32$ Interaction Map generation module via `Outer Product`, and the history-embedding-map-based `Multi-layer 2D CNN` forward pass pipeline of the COMET variant.
+* **📌 COMET Implementation Scope**: The COMET used in this experiment is a simplified COMET-style variant. It applies a 3-layer 2D CNN with max-pooling to a single user-side history map (the 10 most recent items + the target item), and does not include the paper's item-side embedding map or the step that enriches user and item embeddings. The COMET results below therefore reflect this simplified variant, not the performance of the original model.
 * **🔗 Full Lab Report (Source Code)**: A rigorous Jupyter Notebook technical analysis report covering everything from background theories of these models to final architectural conclusions.
 ## 🔗 **[Full Report: comet_deep_dive.ipynb](model-experiments/comet_deep_dive.ipynb)**
 
 ---
 
-## SECTION 2. Structural Limitations of COMET
-> After directly implementing SOTA models and conducting a 5-Epoch benchmark test on synthetic data, the following **structural limitations along with quantitative figures** were clearly derived.
+## SECTION 2. Training Failure Analysis & Structural Limitations
+> After directly implementing SOTA models and conducting a 5-Epoch benchmark test on synthetic data, the following **training failure and structural limitations** were derived.
 
 ### 2.1 Experimental Results & Empirical Discovery
 
@@ -55,7 +56,7 @@ In this experiment, a comprehensive 17-chapter technical investigation was condu
 | **COMET** | *0.0286* | *0.0212* | *0.0456* | 35.6s | 44.7s | **0.6927 $\rightarrow$ 0.6929 (Training Failure / Stagnation)** |
 
 ### 2.2 Deep Root Cause Analysis of Pipeline Limitations
-The experimental results revealed that the COMET model failed to converge normally, exhibiting extremely poor performance with an NDCG@10 of 0.0286 (Training Failure). Analysis proved that this was not a simple algorithmic error, but a **systemic limitation resulting from a mismatch between the underlying data pipeline characteristics and the model architecture**.
+The experimental results revealed that the COMET model failed to converge normally, exhibiting extremely poor performance with an NDCG@10 of 0.0286 (Training Failure). Analysis indicates that this stems from a **mismatch between the characteristics of the source data and the model architecture**. In particular, the synthetic dataset has no temporal order, so the COMET variant, which represents users solely through their interaction histories, had no learnable signal. In addition, unlike the original paper, this implementation has no step that enriches user and item embeddings, leaving the model no other signal to rely on when the history signal is weak. The structural limitations of history-map-based CNN architectures identified through this analysis are as follows:
 
 1. **Lack of Temporal Dependency**: Because embedding maps are scanned using fixed-size CNN kernels, long-term contextual dependencies within user action streams that dynamically change over time cannot be captured along the data flow. Furthermore, when randomly ordered logs without causal relationships (such as this synthetic dataset) are ingested, the CNN filter fails to learn meaningful context.
 2. **Overlooking Structural Connectivity**: The model focuses solely on simple item consumption order, failing to reflect complex relational networks between entities or high-order structural connectivity topologies like co-click patterns into the feature layers. Under sparse data conditions (Density 3%), simple history listing leads to severe overfitting.
@@ -67,7 +68,7 @@ The experimental results revealed that the COMET model failed to converge normal
 
 This project analyzes the structural limitations of existing CNN-based sequential recommendation models from the perspective of data pipelines and architecture, and proposes the **M-Trans4Rec** framework, which efficiently resolves these issues using state-of-the-art Transformer and Graph Neural Network (GNN) components.
 
-Dedicated Encoders (Sequence, Graph, Side Info) corresponding to three distinct data sources are placed in a parallel pipeline, and an **Adaptive Gating Network** is designed to dynamically integrate these heterogeneous data streams in real time. In particular, an **Expansion-Compression architecture** that transforms feature dimensions within hidden layers ($128 \rightarrow 256 \rightarrow 128 \rightarrow 64$) models complex non-linear interactions while strictly controlling computational overhead. This model aims to eliminate existing infrastructure bottlenecks, dramatically enhancing recommendation pipeline throughput and ranking quality (NDCG).
+Dedicated Encoders (Sequence, Graph, Side Info) corresponding to three distinct data sources are placed in a parallel pipeline, and an **Adaptive Gating Network** is designed to dynamically integrate these heterogeneous data streams in real time. In particular, an **Expansion-Compression architecture** that transforms feature dimensions within hidden layers ($128 \rightarrow 256 \rightarrow 128 \rightarrow 64$) models complex non-linear interactions while strictly controlling computational overhead. This model aims to overcome these structural limitations and improve ranking quality (NDCG), particularly under sparse data conditions.
 
 ---
 
@@ -80,7 +81,7 @@ Instead of COMET's static and fixed fusion method, we propose integrating an **A
 The 128-dimensional data stream passing through the Adaptive Fusion layer is temporarily expanded to 256 dimensions upon entering the **Prediction Layer (MLP)** to fully model non-linear relationships among heterogeneous information sources. Subsequently, hierarchical compression is performed back to 128 and 64 dimensions, filtering unnecessary noise in the embedding space while maximizing downstream pipeline processing efficiency and prediction precision.
 
 ### 4.3 Systematic Evaluation Plan (Experimental Plan)
-To verify the effectiveness of this model, a distributed computing and stable infrastructure environment based on **Batch Size 256** capable of large-scale batch processing must be established to conduct performance comparisons against existing SOTA models. Additionally, an experimental design is required to thoroughly evaluate how the data integration process across three dedicated encoders impacts recommendation quality and serving precision.
+To verify the effectiveness of this model, performance comparisons against existing SOTA models must be conducted on real-world public benchmarks such as MovieLens-1M, Yelp, and Amazon Beauty, with sufficient training (50+ epochs with early stopping) and repeated runs across multiple seeds. Additionally, an experimental design is required to thoroughly evaluate how the data integration process across three dedicated encoders impacts recommendation quality and serving precision.
 
 ---
 
@@ -96,7 +97,7 @@ This model is an **End-to-End data processing framework** that receives past use
 | :--- | :--- | :--- | :--- |
 | **Input Layer** | Raw Data | Ingestion and collection of interaction sequence logs, graph topology data, and profile features | [Batch, Variable] |
 | **Encoding Layer** | Multi-Encoders | Independent feature extraction and transformation per heterogeneous domain (Sequential, Graph, Side Info) | [Batch, 128] (Each) |
-| **Fusion Layer** | Gating Network | Real-time importance weight calculation and dynamic feature joining per information source (An adaptive Gold view) | [Batch, 128] |
+| **Fusion Layer** | Gating Network | Real-time importance weight calculation and dynamic feature fusion per information source | [Batch, 128] |
 | **Hidden Layer** | Dense Blocks (MLP) | Feature dimension expansion and step-by-step compression for computational optimization (128 $\rightarrow$ 256 $\rightarrow$ 128 $\rightarrow$ 64) | [Batch, 64] |
 | **Output Layer** | Score Predictor | Derivation of item preference probability (Scalar) for final serving | [Batch, 1] |
 
@@ -135,12 +136,12 @@ This model is an **End-to-End data processing framework** that receives past use
 > The M-Trans4Rec framework is designed to structurally resolve chronic pipeline bottlenecks and data sparsity issues in recommendation systems. Upon adoption, it aims to achieve the following three systemic effects and macro-level improvements as quantitative target hypotheses.
 
 ### 7.1 Pipeline Robustness Under Extreme Data Sparsity
-* **Challenge**: Data in actual large-scale enterprise environments—such as MovieLens-1M (95.5%), Yelp (98.7%), and Amazon Beauty (99.9%) targeted in benchmark planning—inevitably suffers from extreme sparsity due to insufficient user behavioral logs. Single sequence-based models suffer from structural vulnerabilities where overall quality degrades rapidly under such sparse embedding environments.
+* **Challenge**: Real-world public benchmark datasets—such as MovieLens-1M (95.5% sparsity), Yelp (98.7%), and Amazon Beauty (99.9%) targeted in benchmark planning—inevitably suffer from extreme sparsity due to insufficient user behavioral logs. Single sequence-based models suffer from structural vulnerabilities where overall quality degrades rapidly under such sparse embedding environments.
 * **Expected Benefit**: By placing dedicated `Graph` and `Side Info` encoder channels as parallel layers, this architecture ensures serving stability based on topology signals, even when an individual user's linear sequence history is lost or fragmented in a cold state.
 
 ### 7.2 Precision Compensation for Cold-Start Entities & Dynamic Context Control
-* **Challenge**: For newly registered users or newly ingested items with extremely sparse histories, existing CNN pipeline architectures (e.g., COMET) using fixed-size grid inputs incur unnecessary padding computation overhead or overfit to noise features, leading to prediction failures.
-* **Expected Benefit**: Incorporating the `Adaptive Gating Mechanism` allows encoder feature weights to be **dynamically adjusted according to user context**. Specifically, based on design hypotheses in the project proposal, densely linking rich attribute metadata in cold-start environments aims to defend pipeline precision efficiently, improving final prediction accuracy by **up to 15% or more**.
+* **Challenge**: For newly registered users or newly ingested items with extremely sparse histories, history-map-based CNN architectures using fixed-size grid inputs can incur unnecessary padding computation overhead or overfit to noise features, leading to prediction failures.
+* **Expected Benefit**: Incorporating the `Adaptive Gating Mechanism` allows encoder feature weights to be **dynamically adjusted according to user context**. Specifically, densely linking rich attribute metadata in cold-start environments aims to **improve final prediction accuracy**; the magnitude of improvement will be verified through future experiments.
 
 ### 7.3 Recommendation Diversity (Serendipity) & Serving Coverage Enhancement
 * **Challenge**: Systems relying solely on popular item scanning or 1D consumption order logs create biased filter bubbles for users, causing system bottlenecks that reduce recommendation coverage and accelerate user churn.
@@ -150,7 +151,7 @@ This model is an **End-to-End data processing framework** that receives past use
 
 ## 🎓 Closing Statement
 
-This portfolio demonstrates a rigorous analytical process of identifying structural flaws in the latest SOTA model, COMET, through PyTorch implementation and data-characteristic-based root cause analysis, followed by proposing M-Trans4Rec—a next-generation framework designed to overcome these challenges.
+This portfolio demonstrates a rigorous analytical process of implementing a simplified variant of the SOTA model COMET in PyTorch, observing its training failure, and identifying the limitations of history-map-based CNN architectures through data-characteristic-based root cause analysis, followed by proposing M-Trans4Rec—a next-generation framework designed to overcome these challenges.
 
 The core value of this project extends beyond simple hyperparameter tuning; it lies in systematically structuring heterogeneous and sparse multi-source data (sequence logs, graph topologies, static metadata) from an efficient data modeling perspective, and designing a scalable information system architecture that dynamically joins data according to user contexts.
 
@@ -169,11 +170,15 @@ These experiences in heterogeneous data preprocessing, multi-dimensional informa
 * [4] Veličković, P., et al. (2018). "**Graph Attention Networks.**" *International Conference on Learning Representations (ICLR)*. [GAT]
 * [5] Kipf, T. N., & Welling, M. (2017). "**Semi-Supervised Classification with Graph Convolutional Networks.**" *ICLR*. [GCN]
 * [6] Wu, S., et al. (2019). "**Session-Based Recommendation with Graph Neural Networks.**" *AAAI Conference on Artificial Intelligence*. [SR-GNN]
+* [7] He, X., et al. (2020). "**LightGCN: Simplifying and Powering Graph Convolution Network for Recommendation.**" *SIGIR*. [LightGCN]
+* [8] Hamilton, W. L., Ying, R., & Leskovec, J. (2017). "**Inductive Representation Learning on Large Graphs.**" *NeurIPS*. [GraphSAGE]
 
 ### 3. Recommender Systems
-* [6] He, X., et al. (2017). "**Neural Collaborative Filtering.**" *World Wide Web Conference (WWW)*. [NCF]
-* [7] Hidasi, B., et al. (2016). "**Session-based Recommendations with Recurrent Neural Networks.**" *ICLR*. [GRU4Rec]
+* [9] Lin, Z., et al. (2023). "**COMET: Convolutional Dimension Interaction for Collaborative Filtering.**" *ACM Transactions on Intelligent Systems and Technology (TIST)*. [COMET]
+* [10] He, X., et al. (2018). "**Outer Product-based Neural Collaborative Filtering.**" *IJCAI*. [ConvNCF]
+* [11] He, X., et al. (2017). "**Neural Collaborative Filtering.**" *World Wide Web Conference (WWW)*. [NCF]
+* [12] Hidasi, B., et al. (2016). "**Session-based Recommendations with Recurrent Neural Networks.**" *ICLR*. [GRU4Rec]
 
 ### 4. Related Works & Surveys
-* [8] Zhang, S., et al. (2019). "**Deep Learning Based Recommender System: A Survey and New Perspectives.**" *ACM Computing Surveys (CSUR)*.
-* [9] Wu, Z., et al. (2020). "**A Comprehensive Survey on Graph Neural Networks.**" *IEEE Transactions on Neural Networks and Learning Systems*.
+* [13] Zhang, S., et al. (2019). "**Deep Learning Based Recommender System: A Survey and New Perspectives.**" *ACM Computing Surveys (CSUR)*.
+* [14] Wu, Z., et al. (2020). "**A Comprehensive Survey on Graph Neural Networks.**" *IEEE Transactions on Neural Networks and Learning Systems*.
